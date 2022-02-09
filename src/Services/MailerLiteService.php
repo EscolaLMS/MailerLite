@@ -2,7 +2,7 @@
 
 namespace EscolaLms\MailerLite\Services;
 
-use EscolaLms\Auth\Models\User;
+use EscolaLms\Core\Models\User;
 use EscolaLms\MailerLite\Providers\SettingsServiceProvider;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
 use Http\Adapter\Guzzle7\Client;

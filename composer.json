@@ -7,6 +7,7 @@
     "escolalms/auth": "^0",
     "escolalms/core": "^1",
     "escolalms/settings": "^0",
+    "escolalms/cart": "^0",
     "guzzlehttp/guzzle": "^7",
     "laravel/framework": ">=8.0",
     "mailerlite/mailerlite-api-v2-php-sdk": "^0.3.2",

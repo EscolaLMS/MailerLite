@@ -4,6 +4,7 @@ namespace EscolaLms\MailerLite\Providers;
 
 use EscolaLms\Auth\Events\AccountBlocked;
 use EscolaLms\Auth\Events\AccountConfirmed;
+use EscolaLms\Cart\Events\CartOrderPaid;
 use EscolaLms\MailerLite\Enum\GroupNamesEnum;
 use EscolaLms\MailerLite\Enum\PackageStatusEnum;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
@@ -24,6 +25,13 @@ class EventServiceProvider extends ServiceProvider
              * >>> event(new EscolaLms\Auth\Events\AccountConfirmed(App\Models\User::find(18)));
              */
             app(MailerLiteServiceContract::class)->addSubscriberToGroup(GroupNamesEnum::REGISTERED_USERS, $event->user);
+        });
+
+        Event::listen(CartOrderPaid::class, function ($event) {
+            /**
+             * >>> event(new EscolaLms\Cart\Events\CartOrderPaid (EscolaLms\Cart\Models\User::find(18), EscolaLms\Cart\Models\Order::find(1)));
+             */
+            app(MailerLiteServiceContract::class)->addSubscriberToGroup(GroupNamesEnum::ORDER_PAID, $event->getUser());
         });
 
         Event::listen(AccountBlocked::class, function ($event) {

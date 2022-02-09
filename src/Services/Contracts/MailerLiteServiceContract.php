@@ -2,7 +2,7 @@
 
 namespace EscolaLms\MailerLite\Services\Contracts;
 
-use EscolaLms\Auth\Models\User;
+use EscolaLms\Core\Models\User;
 
 interface MailerLiteServiceContract
 {
