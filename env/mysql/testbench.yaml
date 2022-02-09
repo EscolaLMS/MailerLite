@@ -10,9 +10,7 @@ env:
 providers:
   - Laravel\Passport\PassportServiceProvider
   - Spatie\Permission\PermissionServiceProvider
-  - EscolaLms\Mattermost\EscolaLmsMattermostServiceProvider
+  - EscolaLms\MailerLite\EscolaLmsMailerLiteServiceProvider
   - EscolaLms\Settings\EscolaLmsSettingsServiceProvider
-  - Gnello\Mattermost\Laravel\MattermostServiceProvider
   - EscolaLms\Core\EscolaLmsServiceProvider
   - EscolaLms\Auth\EscolaLmsAuthServiceProvider
-  - EscolaLms\Courses\EscolaLmsCourseServiceProvider
