@@ -8,9 +8,6 @@ use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
 use EscolaLms\MailerLite\Services\MailerLiteService;
 use Illuminate\Support\ServiceProvider;
 
-/**
- * SWAGGER_VERSION
- */
 class EscolaLmsMailerLiteServiceProvider extends ServiceProvider
 {
     public $singletons = [
