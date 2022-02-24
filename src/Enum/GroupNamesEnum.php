@@ -6,6 +6,7 @@ use EscolaLms\Core\Enums\BasicEnum;
 
 class GroupNamesEnum extends BasicEnum
 {
-    const REGISTERED_USERS  = 'Registered users';
-    const ORDER_PAID        = 'Users with paid orders';
+    public const REGISTERED_USERS  = 'Registered users';
+    public const ORDER_PAID        = 'Users with paid orders';
+    public const LEFT_CART         = 'Left cart';
 }

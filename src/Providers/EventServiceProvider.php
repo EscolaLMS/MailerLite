@@ -24,14 +24,23 @@ class EventServiceProvider extends ServiceProvider
             /**
              * >>> event(new EscolaLms\Auth\Events\AccountConfirmed(App\Models\User::find(18)));
              */
-            app(MailerLiteServiceContract::class)->addSubscriberToGroup(GroupNamesEnum::REGISTERED_USERS, $event->user);
+            $newsletterKey = Config::get(SettingsServiceProvider::CONFIG_KEY . '.newsletter_field_key');
+            if ($event->user->settings->where('key', 'additional_field:' . $newsletterKey)->first()) {
+                app(MailerLiteServiceContract::class)->addSubscriberToGroup(
+                    Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_registered_group', GroupNamesEnum::REGISTERED_USERS),
+                    $event->user
+                );
+            }
         });
 
         Event::listen(CartOrderPaid::class, function ($event) {
             /**
              * >>> event(new EscolaLms\Cart\Events\CartOrderPaid (EscolaLms\Cart\Models\User::find(18), EscolaLms\Cart\Models\Order::find(1)));
              */
-            app(MailerLiteServiceContract::class)->addSubscriberToGroup(GroupNamesEnum::ORDER_PAID, $event->getUser());
+            app(MailerLiteServiceContract::class)->addSubscriberToGroup(
+                Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_order_paid', GroupNamesEnum::ORDER_PAID),
+                $event->getUser()
+            );
         });
 
         Event::listen(AccountBlocked::class, function ($event) {
