@@ -6,6 +6,7 @@ use EscolaLms\Auth\Database\Seeders\AuthPermissionSeeder;
 use EscolaLms\Auth\Events\AccountBlocked;
 use EscolaLms\Auth\Events\AccountConfirmed;
 use EscolaLms\Auth\Models\User;
+use EscolaLms\Auth\Models\UserSetting;
 use EscolaLms\Core\Tests\ApiTestTrait;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\MailerLite\Enum\PackageStatusEnum;
@@ -66,6 +67,22 @@ class SettingsTest extends TestCase
                         'key' => "{$configKey}.api_key",
                         'value' => 'new_api_key',
                     ],
+                    [
+                        'key' => "{$configKey}.newsletter_field_key",
+                        'value' => 'newsletter',
+                    ],
+                    [
+                        'key' => "{$configKey}.group_registered_group",
+                        'value' => 'registered users',
+                    ],
+                    [
+                        'key' => "{$configKey}.group_order_paid",
+                        'value' => 'order paid',
+                    ],
+                    [
+                        'key' => "{$configKey}.group_left_cart",
+                        'value' => 'left cart',
+                    ],
                 ]
             ]
         )->assertOk();
@@ -99,6 +116,50 @@ class SettingsTest extends TestCase
                     'value' => 'new_api_key',
                     'readonly' => false,
                 ],
+                'newsletter_field_key' => [
+                    'full_key' => "$configKey.newsletter_field_key",
+                    'key' => 'newsletter_field_key',
+                    'rules' => [
+                        'required',
+                        'string'
+                    ],
+                    'public' => false,
+                    'value' => 'newsletter',
+                    'readonly' => false,
+                ],
+                'group_registered_group' => [
+                    'full_key' => "$configKey.group_registered_group",
+                    'key' => 'group_registered_group',
+                    'rules' => [
+                        'required',
+                        'string'
+                    ],
+                    'public' => false,
+                    'value' => 'registered users',
+                    'readonly' => false,
+                ],
+                'group_order_paid' => [
+                    'full_key' => "$configKey.group_order_paid",
+                    'key' => 'group_order_paid',
+                    'rules' => [
+                        'required',
+                        'string'
+                    ],
+                    'public' => false,
+                    'value' => 'order paid',
+                    'readonly' => false,
+                ],
+                'group_left_cart' => [
+                    'full_key' => "$configKey.group_left_cart",
+                    'key' => 'group_left_cart',
+                    'rules' => [
+                        'required',
+                        'string'
+                    ],
+                    'public' => false,
+                    'value' => 'left cart',
+                    'readonly' => false,
+                ],
             ],
         ]);
 
@@ -109,10 +170,14 @@ class SettingsTest extends TestCase
         $this->response->assertJsonMissing([
             'package_status' => PackageStatusEnum::DISABLED,
             'api_key' => 'new_api_key',
+            'newsletter_field_key' => 'newsletter',
+            'group_registered_group' => 'registered users',
+            'group_order_paid' => 'order paid',
+            'group_left_cart' => 'left cart',
         ]);
     }
 
-    public function testAddUserAsSubscriberAfterConfirmingEmail(): void
+    public function testNotAddUserAfterConfirmingEmailWhenPackageIsDisabled(): void
     {
         Event::fake(AccountConfirmed::class);
         Notification::fake();
@@ -130,18 +195,51 @@ class SettingsTest extends TestCase
         $this->response = $this->actingAs($this->user, 'api')->patchJson('/api/admin/users/' . $student1->getKey(), [
             'email_verified' => true,
         ])->assertOk();
+    }
+
+    public function testNotAddUserAfterConfirmingEmailNoAgreement(): void
+    {
+        Event::fake(AccountConfirmed::class);
+        Notification::fake();
 
         $this->setPackageStatus(PackageStatusEnum::ENABLED);
 
-        $student2 = $this->makeStudent([
+        $student = $this->makeStudent([
             'email_verified_at' => null
         ]);
 
         $this->mock(MailerLiteServiceContract::class, function (MockInterface $mock) {
+            $mock->shouldReceive('addSubscriberToGroup')->never();
+        });
+
+        $this->response = $this->actingAs($this->user, 'api')->patchJson('/api/admin/users/' . $student->getKey(), [
+            'email_verified' => true,
+        ])->assertOk();
+    }
+
+    public function testAddUserAfterConfirmingEmail(): void
+    {
+        Event::fake(AccountConfirmed::class);
+        Notification::fake();
+
+        $this->setPackageStatus(PackageStatusEnum::ENABLED);
+
+        $student = $this->makeStudent([
+            'email_verified_at' => null
+        ]);
+
+        UserSetting::factory()->createOne([
+            'user_id' => $student->getKey(),
+            'key' => 'additional_field:newsletter',
+            'value' => 'yes'
+        ]);
+
+        Config::set(SettingsServiceProvider::CONFIG_KEY . '.newsletter_field_key', 'newsletter');
+        $this->mock(MailerLiteServiceContract::class, function (MockInterface $mock) {
             $mock->shouldReceive('addSubscriberToGroup')->once();
         });
 
-        $this->response = $this->actingAs($this->user, 'api')->patchJson('/api/admin/users/' . $student2->getKey(), [
+        $this->response = $this->actingAs($this->user, 'api')->patchJson('/api/admin/users/' . $student->getKey(), [
             'email_verified' => true,
         ])->assertOk();
     }
