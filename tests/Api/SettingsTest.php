@@ -13,6 +13,7 @@ use EscolaLms\MailerLite\Enum\PackageStatusEnum;
 use EscolaLms\MailerLite\Providers\SettingsServiceProvider;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
 use EscolaLms\MailerLite\Tests\TestCase;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use EscolaLms\Settings\Database\Seeders\PermissionTableSeeder;
 use EscolaLms\Settings\Facades\AdministrableConfig;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -224,14 +225,17 @@ class SettingsTest extends TestCase
 
         $this->setPackageStatus(PackageStatusEnum::ENABLED);
 
-        $student = $this->makeStudent([
-            'email_verified_at' => null
-        ]);
+        ModelFields::addOrUpdateMetadataField(
+            User::class,
+            'newsletter',
+            'boolean',
+            '',
+            ['boolean']
+        );
 
-        UserSetting::factory()->createOne([
-            'user_id' => $student->getKey(),
-            'key' => 'additional_field:newsletter',
-            'value' => 'yes'
+        $student = $this->makeStudent([
+            'email_verified_at' => null,
+            'newsletter' => true,
         ]);
 
         Config::set(SettingsServiceProvider::CONFIG_KEY . '.newsletter_field_key', 'newsletter');
