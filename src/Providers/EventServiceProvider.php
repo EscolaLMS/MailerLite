@@ -4,7 +4,7 @@ namespace EscolaLms\MailerLite\Providers;
 
 use EscolaLms\Auth\Events\AccountBlocked;
 use EscolaLms\Auth\Events\AccountConfirmed;
-use EscolaLms\Cart\Events\CartOrderPaid;
+use EscolaLms\Cart\Events\ProductBought;
 use EscolaLms\MailerLite\Enum\GroupNamesEnum;
 use EscolaLms\MailerLite\Enum\PackageStatusEnum;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
@@ -25,7 +25,8 @@ class EventServiceProvider extends ServiceProvider
              * >>> event(new EscolaLms\Auth\Events\AccountConfirmed(App\Models\User::find(18)));
              */
             $newsletterKey = Config::get(SettingsServiceProvider::CONFIG_KEY . '.newsletter_field_key');
-            if ($event->user->settings->where('key', 'additional_field:' . $newsletterKey)->first()) {
+            $user = $event->user;
+            if ($user->{$newsletterKey}) {
                 app(MailerLiteServiceContract::class)->addSubscriberToGroup(
                     Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_registered_group', GroupNamesEnum::REGISTERED_USERS),
                     $event->user
@@ -33,9 +34,9 @@ class EventServiceProvider extends ServiceProvider
             }
         });
 
-        Event::listen(CartOrderPaid::class, function ($event) {
+        Event::listen(ProductBought::class, function ($event) {
             /**
-             * >>> event(new EscolaLms\Cart\Events\CartOrderPaid (EscolaLms\Cart\Models\User::find(18), EscolaLms\Cart\Models\Order::find(1)));
+             * >>> event(new EscolaLms\Cart\Events\ProductBought (EscolaLms\Cart\Models\Product::find(1), EscolaLms\Cart\Models\Order::find(1), EscolaLms\Cart\Models\User::find(18)));
              */
             app(MailerLiteServiceContract::class)->addSubscriberToGroup(
                 Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_order_paid', GroupNamesEnum::ORDER_PAID),
