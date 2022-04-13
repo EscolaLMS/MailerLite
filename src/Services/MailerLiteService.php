@@ -7,6 +7,7 @@ use EscolaLms\MailerLite\Providers\SettingsServiceProvider;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
 use Http\Adapter\Guzzle7\Client;
 use Illuminate\Support\Facades\Config;
+use MailerLiteApi\Api\Subscribers;
 use MailerLiteApi\MailerLite;
 
 class MailerLiteService implements MailerLiteServiceContract
@@ -41,6 +42,24 @@ class MailerLiteService implements MailerLiteServiceContract
             ]);
 
             return isset($response->id);
+        }
+
+        return false;
+    }
+
+    public function removeSubscriberFromGroup(string $groupName, User $user): bool
+    {
+        $group = $this->getOrCreateGroup($groupName);
+
+        if (isset($group->id)) {
+            $subscriberModel = $this->mailerLiteClient->subscribers();
+            $subscriber = $subscriberModel->find($user->email);
+
+            if (isset($subscriber->id)) {
+                $this->mailerLiteClient->groups()->removeSubscriber($group->id, $subscriber->id);
+
+                return true;
+            }
         }
 
         return false;
