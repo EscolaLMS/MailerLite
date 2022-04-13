@@ -57,6 +57,19 @@ class MailerLiteServiceTest extends TestCase
         $this->assertTrue($this->service->addSubscriberToGroup('testGroup', $student));
     }
 
+    public function testRemoveSubscriberFromGroup(): void
+    {
+        $student = $this->makeStudent([
+            'email' => 'test@example.com',
+        ]);
+
+        $this->mock->append(new Response(200, ['X-MailerLite-ApiKey' => '123'], json_encode(['id' => 123, 'name' => 'testGroup'])));
+        $this->mock->append(new Response(200, ['X-MailerLite-ApiKey' => '123'], json_encode(['id' => 123, 'email' => 'test@example.com'])));
+        $this->mock->append(new Response(200, ['X-MailerLite-ApiKey' => '123']));
+
+        $this->assertTrue($this->service->removeSubscriberFromGroup('testGroup', $student));
+    }
+
     public function testDeleteExistingSubscriber(): void
     {
         $student = $this->makeStudent([

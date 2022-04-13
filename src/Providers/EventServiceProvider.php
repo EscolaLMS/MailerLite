@@ -5,6 +5,7 @@ namespace EscolaLms\MailerLite\Providers;
 use EscolaLms\Auth\Events\AccountBlocked;
 use EscolaLms\Auth\Events\AccountConfirmed;
 use EscolaLms\Cart\Events\AbandonedCartEvent;
+use EscolaLms\Cart\Events\OrderCreated;
 use EscolaLms\Cart\Events\ProductBought;
 use EscolaLms\MailerLite\Enum\GroupNamesEnum;
 use EscolaLms\MailerLite\Enum\PackageStatusEnum;
@@ -54,9 +55,19 @@ class EventServiceProvider extends ServiceProvider
 
         Event::listen(AbandonedCartEvent::class, function ($event) {
             /**
-             * >>> event(new EscolaLms\Cart\Events\AbandonedCartEvent(EscolaLms\Cart\Models\cart::find(1)));
+             * >>> event(new EscolaLms\Cart\Events\AbandonedCartEvent(EscolaLms\Cart\Models\Cart::find(1)));
              */
             app(MailerLiteServiceContract::class)->addSubscriberToGroup(
+                Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_left_cart', GroupNamesEnum::LEFT_CART),
+                $event->getUser()
+            );
+        });
+
+        Event::listen(OrderCreated::class, function ($event) {
+            /**
+             * >>> event(new EscolaLms\Cart\Events\OrderCreated(EscolaLms\Cart\Models\Order::find(1)));
+             */
+            app(MailerLiteServiceContract::class)->removeSubscriberFromGroup(
                 Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_left_cart', GroupNamesEnum::LEFT_CART),
                 $event->getUser()
             );
