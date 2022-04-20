@@ -38,7 +38,7 @@ class EventServiceProvider extends ServiceProvider
 
         Event::listen(ProductBought::class, function ($event) {
             /**
-             * >>> event(new EscolaLms\Cart\Events\ProductBought (EscolaLms\Cart\Models\Product::find(1), EscolaLms\Cart\Models\Order::find(1), EscolaLms\Cart\Models\User::find(18)));
+             * >>> event(new EscolaLms\Cart\Events\ProductBought(EscolaLms\Cart\Models\Product::find(1), EscolaLms\Vouchers\Models\Order::find(1), EscolaLms\Core\Models\User::find(18)));
              */
             app(MailerLiteServiceContract::class)->addSubscriberToGroup(
                 Config::get(SettingsServiceProvider::CONFIG_KEY . '.group_order_paid', GroupNamesEnum::ORDER_PAID),
