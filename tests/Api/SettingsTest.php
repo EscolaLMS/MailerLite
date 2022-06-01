@@ -6,7 +6,6 @@ use EscolaLms\Auth\Database\Seeders\AuthPermissionSeeder;
 use EscolaLms\Auth\Events\AccountBlocked;
 use EscolaLms\Auth\Events\AccountConfirmed;
 use EscolaLms\Auth\Models\User;
-use EscolaLms\Auth\Models\UserSetting;
 use EscolaLms\Core\Tests\ApiTestTrait;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\MailerLite\Enum\PackageStatusEnum;
@@ -14,6 +13,8 @@ use EscolaLms\MailerLite\Providers\SettingsServiceProvider;
 use EscolaLms\MailerLite\Services\Contracts\MailerLiteServiceContract;
 use EscolaLms\MailerLite\Tests\TestCase;
 use EscolaLms\ModelFields\Facades\ModelFields;
+use EscolaLms\ModelFields\Models\Field;
+use EscolaLms\ModelFields\Models\Metadata;
 use EscolaLms\Settings\Database\Seeders\PermissionTableSeeder;
 use EscolaLms\Settings\Facades\AdministrableConfig;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -49,6 +50,8 @@ class SettingsTest extends TestCase
     protected function tearDown(): void
     {
         \EscolaLms\Settings\Models\Config::truncate();
+        Field::truncate();
+        Metadata::truncate();
         User::query()->delete();
     }
 
