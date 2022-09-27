@@ -52,7 +52,7 @@ class SettingsTest extends TestCase
         \EscolaLms\Settings\Models\Config::truncate();
         Field::truncate();
         Metadata::truncate();
-        User::query()->delete();
+        User::query()->forceDelete();
     }
 
     public function testAdministrableConfigApi(): void
